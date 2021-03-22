@@ -12,7 +12,7 @@
 #include <mpi.h>
 #include <string.h>
 #include "MyMPI.h"
-
+#include <stdint.h>
 
 /***************** MISCELLANEOUS FUNCTIONS *****************/
 
@@ -42,9 +42,11 @@ int get_size (MPI_Datatype t) {
 
 void *my_malloc (
    int id,     /* IN - Process rank */
-   int bytes)  /* IN - Bytes to allocate */
+   long long int bytes)  /* IN - Bytes to allocate */
 {
+   	
    void *buffer;
+  // printf("%lld bytes\n",  bytes);
    if ((buffer = malloc ((size_t) bytes)) == NULL) {
       printf ("Error: Malloc failed for process %d\n", id);
       fflush (stdout);
@@ -441,9 +443,9 @@ void read_row_striped_matrix (
 
    /* Dynamically allocate matrix. Allow double subscripting
       through 'a'. */
-
+//printf("%lld \n", (long)local_rows* (long)*n *(long)datum_size);
    *storage = (void *) my_malloc (id,
-       local_rows * *n * datum_size);
+      (long)local_rows * (long)*n * (long)datum_size);
    *subs = (void **) my_malloc (id, local_rows * PTR_SIZE);
 
    lptr = (void *) &(*subs[0]);

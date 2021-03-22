@@ -58,6 +58,11 @@ int main (int argc, char *argv[]) {
    char* outFile;
    int vecN;
    int vecM;
+   FILE *foutptr;
+   double overallSeconds;
+   double maxOverallSeconds;
+   double otherSeconds;
+   int valueOne = 1;
 	if(argc == 1)
 		usage();
 
@@ -79,17 +84,19 @@ int main (int argc, char *argv[]) {
 	}
 
 
-
+  // overallSeconds = -MPI_Wtime();
 
    MPI_Init (&argc, &argv);
    MPI_Comm_rank (MPI_COMM_WORLD, &id);
    MPI_Comm_size (MPI_COMM_WORLD, &p);
-
+   overallSeconds = -MPI_Wtime();
+//printf("Started first array read\n");
    read_row_striped_matrix (mtxFile, (void *) &a,
       (void *) &storage, mpitype, &m, &n, MPI_COMM_WORLD);
+//printf("Completed first array read\n");
    rows = BLOCK_SIZE(id,p,m);
-   print_row_striped_matrix ((void **) a, mpitype, m, n,
-      MPI_COMM_WORLD);
+//   print_row_striped_matrix ((void **) a, mpitype, m, n,
+  //    MPI_COMM_WORLD);
 
    //read_replicated_vector (vecFile, (void *) &b, mpitype,
      // &nprime, MPI_COMM_WORLD);
@@ -97,10 +104,11 @@ int main (int argc, char *argv[]) {
      // MPI_COMM_WORLD);
   read_row_striped_matrix (vecFile, (void *) &b, 
 	(void *) &storage, mpitype, &vecM, &vecN, MPI_COMM_WORLD);
-  print_row_striped_matrix ((void **) b, mpitype, vecM, vecN, MPI_COMM_WORLD);
+ // print_row_striped_matrix ((void **) b, mpitype, vecM, vecN, MPI_COMM_WORLD);
 
-   printf("%d, %d \n" , rows, n);
+  // printf("%d, %d \n" , m, n);
    c_block = (dtype *) malloc (rows * sizeof(dtype));
+//	printf("rows*sizeof(dtype) = %ld\n ", rows*sizeof(dtype));
    c = (dtype *) malloc (n * sizeof(dtype));
    MPI_Barrier (MPI_COMM_WORLD);
    seconds = - MPI_Wtime();
@@ -115,15 +123,28 @@ int main (int argc, char *argv[]) {
    MPI_Barrier (MPI_COMM_WORLD);
    seconds += MPI_Wtime();
 
-   print_replicated_vector (c, mpitype, n, MPI_COMM_WORLD);
+   //print_replicated_vector (c, mpitype, n, MPI_COMM_WORLD);
+	//dtype** myC = c;
+	
+	foutptr = fopen(outFile, "w");
+	fwrite(&n, sizeof(int), 1, foutptr);
+	fwrite(&valueOne, sizeof(int), 1, foutptr);
+	fwrite((void *) c, sizeof(double), n, foutptr);
+	fclose(foutptr);
+
+   overallSeconds += MPI_Wtime();
+	
 
    MPI_Allreduce (&seconds, &max_seconds, 1, mpitype, MPI_MAX,
       MPI_COMM_WORLD);
+   MPI_Allreduce (&overallSeconds, &maxOverallSeconds, 1, mpitype, MPI_MAX, MPI_COMM_WORLD);
+   otherSeconds = maxOverallSeconds - max_seconds;
    if (!id) {
-      printf ("MV1) N = %d, Processes = %d, Time = %12.6f sec,",
-         n, p, max_seconds);
-      printf ("Mflop = %6.2f\n", 2*n*n/(1000000.0*max_seconds));
+      printf ("MV1) N = %d, Processes = %d, Overall Time = %12.6f , CompTime = %12.6f sec, other Time = %12.6f",
+         n, p, maxOverallSeconds, max_seconds, otherSeconds);
+      //printf ("Mflop = %6.2f\n", 2*n*n/(1000000.0*max_seconds));
    }
    MPI_Finalize();
+
    return 0;
 }
