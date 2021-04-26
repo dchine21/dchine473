@@ -1,19 +1,31 @@
 CFLAGS = -g -Wall -Wstrict-prototypes
-PROGS = exchange
-OBJECTS = exchange.o functions.o
+PROGS = print-2d make-2d stencil-2d pth-stencil-2d
+OBJECTS = print-2d.o make-2d.o stencil-2d.o pth-stencil-2d.o
 LDFLAGS = -lm
 CC = gcc
-MCC = mpicc
 
 all: $(PROGS)
 
-exchange: $(OBJECTS)
-	$(MCC) -o exchange $(OBJECTS) $(LDFLAGS)
+print-2d.o: print-2d.c
+	$(CC) $(CFLAGS) -c print-2d.c
+print-2d: print-2d.o
+	$(CC) $(CFLAGS) -o print-2d print-2d.o
 
-exchange.o: exchange.c
-	$(MCC) $(CFLAGS) -c exchange.c
+make-2d.o: make-2d.c
+	$(CC) $(CFLAGS) -c make-2d.c
+make-2d: make-2d.o
+	$(CC) $(CFLAGS) -o make-2d make-2d.o
 
-functions.o: functions.c functions.h
-	$(MCC) $(CFLAGS) -c functions.c $(LDFLAGS)
+stencil-2d.o: stencil-2d.c
+	$(CC) $(CFLAGS) -c stencil-2d.c
+stencil-2d: stencil-2d.o
+	$(CC) $(CFLAGS) -o stencil-2d stencil-2d.o
+
+pth-stencil-2d.o: pth-stencil-2d.c
+	$(CC) $(CFLAGS) -c pth-stencil-2d.c
+pth-stencil-2d: pth-stencil-2d.o
+	$(CC) $(CFLAGS) -o pth-stencil-2d pth-stencil-2d.o
+
+
 clean:
 	rm -f $(PROGS) *.o core*

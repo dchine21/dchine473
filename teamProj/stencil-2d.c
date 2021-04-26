@@ -2,14 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <pthread.h>
 
-/** Global Variables **/
-int thread_count;
-int m;
-double** A;
-double** B;
-double** tmp;
 
 void print2d(double** a, int nrows, int ncols){
 	for(int i = 0; i<nrows; i++){
@@ -20,7 +13,7 @@ void print2d(double** a, int nrows, int ncols){
 }
 
 void usage(){
-	printf("<usage>: ./stencil-2d -v <debug> -n <num iterations> -i <infile> -o <outfile> -t <num threads>.\n");
+	printf("<usage>: ./stencil-2d -n <num iterations> -i <infile> -o <outfile>\n");
 	exit(0);
 }
 
@@ -33,8 +26,8 @@ int main(int argc, char* argv[]){
 	char* fileOut;
 	int numRows;
 	int numCols;
-	//double** A;
-	//double** B;
+	double** A;
+	double** B;
 	int numIter;
 	int iters = 0;
 
@@ -99,14 +92,14 @@ int main(int argc, char* argv[]){
 		for(int i = 1; i < numRows - 1; i++){
 			for(int j = 1; j < numCols - 1; j++){
 				//printf("Computing cell %d...\n", i+j);
-				B[i][j] = (A[i-1][j-1] + A[i-1][j] + A[i-1][j+1] + A[i][j+1] + A[i+1][j+1] + A[i+1][j] + A[i+1][j-1] + A[i][j-1] + A[i][j])/9;
+				B[i][j] = (A[i-1][j-1] + A[i-1][j] + A[i-1][j+1] + A[i][j-1] + A[i][j] + A[i][j+1] + A[i+1][j-1] + A[i+1][j] + A[i+1][j+1])/9;
 			//printf("B[%d][%d] = %f\n",i,j,B[i][j]);
 			}
 		}
 		print2d(B, numRows, numCols);
 		printf("\n");
 		//Swap pointers
-		//double** tmp;
+		double** tmp;
 		tmp = A;
 		A = B;
 		B = tmp;
