@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
-#include "pthread_barrier.h"
 #include "functions.h"
 
 #define SWAP(x, y) { double **temp = x; x = y; y = temp; }
@@ -73,7 +72,7 @@ int main(int argc, char* argv[]) {
             break;
             case 't':
                if(optarg != NULL)
-                  debug = atoi(optarg);
+                  thread_count = atoi(optarg);
             break;  
          case '?':
          default:
@@ -103,21 +102,21 @@ int main(int argc, char* argv[]) {
       createBStart(B, rows, cols);
       print2d(A, rows, cols);
       
-      printf("1\n");
+      //printf("1\n");
       pthread_barrier_init(&barrier, NULL, thread_count);
-      printf("2\n");
+      //printf("2\n");
       thread_handles = malloc(thread_count*sizeof(pthread_t));
-      printf("3\n");
+      //printf("3\n");
       for (thread = 0; thread < thread_count; thread++)
          pthread_create(&thread_handles[thread], NULL, Pth_stencil, (void*) thread);
       
-      printf("4\n");
+      //printf("4\n");
 
       for (thread = 0; thread < thread_count; thread++)
          pthread_join(thread_handles[thread], NULL);
-      printf("5\n");
-      pthread_barrier_destroy(&barrier);
-       printf("6\n");
+      //printf("5\n");
+     pthread_barrier_destroy(&barrier);
+       //printf("6\n");
    }else{
 
       fclose(fptr);
@@ -142,26 +141,38 @@ void *Pth_stencil(void* rank) {
 
    long my_rank = (long) rank;
    int start_row, end_row;
-   double **a = A, **b = B;
-
+   //double **a = A, **b = B;
+   
    printf("%ld is ready", my_rank);
 
    start_row = BLOCK_LOW(my_rank, thread_count, rows);
    end_row = BLOCK_HIGH(my_rank,thread_count, rows);
+   
+   if(my_rank == 0){
+	start_row++;
+   }
+   if(my_rank == thread_count-1){
+	end_row--;
+   }
 
+	printf("rank %ld, start_row: %d, end_row: %d\n", my_rank, start_row, end_row);
+	pthread_barrier_wait(&barrier);
    for (int iterations = 0; iterations < n; iterations++){
       for (int i = start_row; i <= end_row; i++){
             for (int j = 1; j < cols-1; j++){
-               b[j][i] = ( a[i-1][j-1] + a[i-1][j] + a[i-1][j+1] + a[i][j+1] + a[i+1][j+1] + a[i+1][j] + a[i+1][j-1] + a[i][j-1] + a[i][j]  ) / 9.0;
+	//printf("rank %ld, col %d\n", my_rank, j);
+               B[i][j] = ( A[i-1][j-1] + A[i-1][j] + A[i-1][j+1] + A[i][j+1] + A[i+1][j+1] + A[i+1][j] + A[i+1][j-1] + A[i][j-1] + A[i][j]  ) / 9.0;
             }
       }
-
+	//printf("%ld waiting: %d\n",my_rank, iterations);
       pthread_barrier_wait(&barrier);
-      SWAP(a, b);
-
-      if(my_rank == 1)
-         print2d(a, rows, cols);
-
+	if(my_rank == 0){
+      SWAP(A, B);
+	//double** tmp = A;
+	//A = B;
+	//B = tmp;
+        print2d(A, rows, cols);
+	}
    }
 
     return NULL;

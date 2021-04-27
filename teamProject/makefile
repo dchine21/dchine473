@@ -1,7 +1,7 @@
-CFLAGS = -std=c99 -g -Wall -Wstrict-prototypes
+CFLAGS = -g -Wall -Wstrict-prototypes
 PROGS = pth-stencil-2d make-2d print-2d
 OBJECTS1 = make-2d.o functions.o 
-OBJECTS2 = pth-stencil-2d.o functions.o pthread_barrier.o
+OBJECTS2 = pth-stencil-2d.o functions.o
 OBJECTS3 = print-2d.o
 LDFLAGS = -lm
 CC = gcc
@@ -12,7 +12,7 @@ make-2d: $(OBJECTS1)
 	$(CC) $(LDFLAGS) -o make-2d $(OBJECTS1)
 
 pth-stencil-2d: $(OBJECTS2)
-	$(CC) $(LDFLAGS) -o pth-stencil-2d $(OBJECTS2)
+	$(CC) $(LDFLAGS) -o pth-stencil-2d $(OBJECTS2) -lpthread
 
 print-2d: $(OBJECTS3)
 	$(CC) $(LDFLAGS) -o print-2d $(OBJECTS3)
@@ -28,9 +28,6 @@ print-2d.o: print-2d.c
 
 functions.o: functions.c functions.h
 	$(CC) $(CFLAGS) -c functions.c
-
-pthread_barrier.o: pthread_barrier.c pthread_barrier.h
-	$(CC) $(CFLAGS) -c pthread_barrier.c
 
 clean:
 	rm -f $(PROGS) *.o core*
