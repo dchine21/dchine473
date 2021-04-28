@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
+#include "pthread_barrier.h"
 #include "functions.h"
 
 #define SWAP(x, y) { double **temp = x; x = y; y = temp; }
@@ -102,11 +103,16 @@ int main(int argc, char* argv[]) {
       createBStart(B, rows, cols);
       print2d(A, rows, cols);
       
+      if(thread_count > rows-2)
+         thread_count = rows-2;
+ 
+
       //printf("1\n");
       pthread_barrier_init(&barrier, NULL, thread_count);
       //printf("2\n");
       thread_handles = malloc(thread_count*sizeof(pthread_t));
       //printf("3\n");
+
       for (thread = 0; thread < thread_count; thread++)
          pthread_create(&thread_handles[thread], NULL, Pth_stencil, (void*) thread);
       
@@ -143,17 +149,20 @@ void *Pth_stencil(void* rank) {
    int start_row, end_row;
    //double **a = A, **b = B;
    
-   printf("%ld is ready", my_rank);
+   //printf("%ld is ready", my_rank);
 
-   start_row = BLOCK_LOW(my_rank, thread_count, rows);
-   end_row = BLOCK_HIGH(my_rank,thread_count, rows);
+   start_row = BLOCK_LOW(my_rank, thread_count, rows-2);
+   end_row = BLOCK_HIGH(my_rank,thread_count, rows-2);
    
-   if(my_rank == 0){
-	start_row++;
-   }
-   if(my_rank == thread_count-1){
-	end_row--;
-   }
+   // if(my_rank == 0 ){
+	//    start_row++;
+   // }
+   // if(my_rank == thread_count-1){
+	//    end_row--;
+   // }
+
+   start_row++;
+   end_row++;
 
 	printf("rank %ld, start_row: %d, end_row: %d\n", my_rank, start_row, end_row);
 	pthread_barrier_wait(&barrier);
@@ -165,13 +174,12 @@ void *Pth_stencil(void* rank) {
             }
       }
 	//printf("%ld waiting: %d\n",my_rank, iterations);
-      pthread_barrier_wait(&barrier);
-	if(my_rank == 0){
+      
+   pthread_barrier_wait(&barrier);
+	
+   if(my_rank == 0){
       SWAP(A, B);
-	//double** tmp = A;
-	//A = B;
-	//B = tmp;
-        print2d(A, rows, cols);
+      print2d(A, rows, cols);
 	}
    }
 
