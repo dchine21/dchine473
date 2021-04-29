@@ -4,6 +4,23 @@
 #include <math.h>
 #include "functions.h"
 
+long int findSize(char file_name[]){
+	FILE* fp = fopen(file_name, "r");
+
+	if (fp == NULL){
+	printf("File not found!\n");
+	return -1;
+	}
+
+	fseek(fp, 0L, SEEK_END);
+	
+	long int res = ftell(fp);
+
+	fclose(fp);
+	
+	return res;
+}
+
 
 double** alloc2d(int nrows, int ncols) {
    // first allocate a block of memory for the row pointers
