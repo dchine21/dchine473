@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
+#include "pthread_barrier.h"
 #include "functions.h"
 
 #define SWAP(x, y) { double **temp = x; x = y; y = temp; }
@@ -80,13 +81,13 @@ int main(int argc, char* argv[]) {
 
       }   
     } 
-   GET_TIME(ovStart);
-   if ((fptr = fopen (infile, "r")) == NULL){
-         printf("Error: could not open input file \n");
-         usage();
-     }
-    
-    //fptr = fopen(infile, "r");
+   
+   //  if ((fptr = fopen (infile, "r")) == NULL){
+   //      printf("Error: could not open input file \n");
+   //      usage();
+   //  }
+    GET_TIME(ovStart);
+    fptr = fopen(infile, "r");
 
     fread(&rows, sizeof(int), 1, fptr);
     fread(&cols, sizeof(int), 1, fptr);
@@ -172,6 +173,13 @@ void *Pth_stencil(void* rank) {
 
    start_row = BLOCK_LOW(my_rank, thread_count, rows);
    end_row = BLOCK_HIGH(my_rank,thread_count, rows);
+   
+    if(my_rank == 0 ){
+	    //start_row++;
+    }
+    if(my_rank == thread_count-1){
+	    //end_row--;
+    }
 
    //start_row++;
    //end_row++;
@@ -181,13 +189,16 @@ void *Pth_stencil(void* rank) {
    GET_TIME(compStart);
    for (int iterations = 0; iterations < n; iterations++){
       for (int i = start_row; i <= end_row; i++){
-      	for (int j = 1; j < cols-1; j++){
+		//if(i != 0 && i != rows-1){
+            for (int j = 1; j < cols-1; j++){
 		if(i != 0 && i != rows-1){
+	//printf("rank %ld, col %d\n", my_rank, j);
 		B[i][j] = ( A[i-1][j-1] + A[i-1][j] + A[i-1][j+1] + A[i][j+1] + A[i+1][j+1] + A[i+1][j] + A[i+1][j-1] + A[i][j-1] + A[i][j]  ) / 9.0;
             }
 	}
       }
-	      
+	//printf("%ld waiting: %d\n",my_rank, iterations);
+      
    pthread_barrier_wait(&barrier);
 	
    if(my_rank == 0){
@@ -203,6 +214,9 @@ void *Pth_stencil(void* rank) {
    }
    GET_TIME(compFinish);
    compTotal = compFinish - compStart;
-   
+   //if(my_rank == 0){
+//	if(debug == 2 || debug == 1)
+	//printf("Computation time = %e seconds\n", compFinish - compStart);
+  // }
     return NULL;
 }
