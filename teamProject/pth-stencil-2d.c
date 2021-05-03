@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
-#include "pthread_barrier.h"
 #include "functions.h"
 
 #define SWAP(x, y) { double **temp = x; x = y; y = temp; }
@@ -186,11 +185,12 @@ void *Pth_stencil(void* rank) {
 	//printf("Thread Count: %d\n", thread_count);
 	//printf("rank %ld, start_row: %d, end_row: %d\n", my_rank, start_row, end_row);
 	//pthread_barrier_wait(&barrier);
+	int iterations, i, j;
    GET_TIME(compStart);
-   for (int iterations = 0; iterations < n; iterations++){
-      for (int i = start_row; i <= end_row; i++){
+   for (iterations = 0; iterations < n; iterations++){
+      for (i = start_row; i <= end_row; i++){
 		//if(i != 0 && i != rows-1){
-            for (int j = 1; j < cols-1; j++){
+            for (j = 1; j < cols-1; j++){
 		if(i != 0 && i != rows-1){
 	//printf("rank %ld, col %d\n", my_rank, j);
 		B[i][j] = ( A[i-1][j-1] + A[i-1][j] + A[i-1][j+1] + A[i][j+1] + A[i+1][j+1] + A[i+1][j] + A[i+1][j-1] + A[i][j-1] + A[i][j]  ) / 9.0;

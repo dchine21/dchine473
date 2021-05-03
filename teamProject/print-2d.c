@@ -58,9 +58,9 @@ int main (int argc, char * argv[]) {
 
         fread(a, sizeof(double), (rows*cols), fptr);
         fclose(fptr);
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++){
+	int i,j;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++){
                 printf("%.2f\t", *a++);
             }  
             printf ("\n");

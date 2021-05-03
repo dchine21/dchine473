@@ -57,9 +57,9 @@ int main (int argc, char * argv[]) {
    
    if (a != NULL){
       ptr = a;
-   
-      for (int i = 0; i < rows; i++) {
-         for (int j = 0; j < cols; j++)
+      int i,j;   
+      for (i = 0; i < rows; i++) {
+         for (j = 0; j < cols; j++)
 
              if(j == 0 || j == (cols - 1))
                  *(ptr++) = 1;  
