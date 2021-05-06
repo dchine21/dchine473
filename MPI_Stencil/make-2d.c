@@ -54,12 +54,12 @@ int main (int argc, char * argv[]) {
    } 
 
    a = (double *) malloc ((rows * cols + 1)* sizeof(double));
-   
+	int i,j;   
    if (a != NULL){
       ptr = a;
    
-      for (int i = 0; i < rows; i++) {
-         for (int j = 0; j < cols; j++)
+      for (i = 0; i < rows; i++) {
+         for (j = 0; j < cols; j++)
 
              if(j == 0 || j == (cols - 1))
                  *(ptr++) = 1;  

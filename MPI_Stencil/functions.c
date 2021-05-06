@@ -27,8 +27,9 @@ double** alloc2d(int nrows, int ncols) {
    double **x = (double **)malloc(nrows*sizeof(double *));
    // Now allocate a block of memory for the 2D array
    x[0] = (void *)malloc(nrows*ncols*sizeof(double));
-   // Last, assign the memory location to point to in the block of data for each row pointer
-   for (int j = 1; j < nrows; j++) {
+	int j; 
+  // Last, assign the memory location to point to in the block of data for each row pointer
+   for (j = 1; j < nrows; j++) {
       x[j] = x[j-1] + ncols;
    }
    return x;
@@ -39,8 +40,9 @@ void alloc2dnew(double*** a, int nrows, int ncols) {
    double **x = (double **)malloc(nrows*sizeof(double *));
    // Now allocate a block of memory for the 2D array
    x[0] = (void *)malloc(nrows*ncols*sizeof(double));
-   // Last, assign the memory location to point to in the block of data for each row pointer
-   for (int j = 1; j < nrows; j++) {
+	int j;   
+// Last, assign the memory location to point to in the block of data for each row pointer
+   for (j = 1; j < nrows; j++) {
       x[j] = x[j-1] + ncols;
    }
 
@@ -48,16 +50,18 @@ void alloc2dnew(double*** a, int nrows, int ncols) {
 }
 
 void fill2d(double** a, int nrows, int ncols) {
-    for(int i=0; i<nrows; i++) {
-        for(int j=0; j<ncols; j++) {
+   	int i,j;
+    for(i=0; i<nrows; i++) {
+        for(j=0; j<ncols; j++) {
             a[i][j] = j+i*ncols;
         }
     }
 }
 
 void createBStart(double** b, double** a, int nrows, int ncols) {
-    for(int i=0; i<nrows; i++) {
-        for(int j=0; j<ncols; j++) {
+	int i,j;
+    for(i=0; i<nrows; i++) {
+        for(j=0; j<ncols; j++) {
             //if(j == 0 || j == ncols-1)
                 b[i][j] = a[i][j];
             //else
@@ -67,8 +71,9 @@ void createBStart(double** b, double** a, int nrows, int ncols) {
 }
 
 void print2d(double** a, int nrows, int ncols) {
-    for(int i=0; i<nrows; i++) {
-        for(int j=0; j<ncols; j++) {
+	int i,j;
+    for(i=0; i<nrows; i++) {
+        for(j=0; j<ncols; j++) {
             printf("%.2f\t", a[i][j]);
         } printf("\n");
     }

@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
       //printf("4\n");
 	MPI_Gather(A[1], my_rows*cols, MPI_DOUBLE, FIN[0], my_rows*cols, MPI_DOUBLE,  0, MPI_COMM_WORLD);	
       //printf("5\n");
-        if(rank == 0){
+        if(rank == 0 && debug == 2){
 	print2d(FIN, rows, cols);
 	}
      
@@ -222,19 +222,17 @@ void *MPI_stencil(int rank, int size) {
 
    GET_TIME(compStart);
    exchange_values(A, A, A, rank, size, cols, my_rows);
+
    //exchange_values(B, B, B, rank, size, cols, my_rows);
-   for (int iterations = 0; iterations < n; iterations++){
+	int iterations,i,j;
+   for (iterations = 0; iterations < n; iterations++){
 	MPI_Barrier(MPI_COMM_WORLD);
 	
-	//exchange_values(A, A, B, rank, size, cols, my_rows);
-	//if(iterations >= 2){
 	exchange_values(A, A, A, rank, size, cols, my_rows);
-	
-	
 		
 	MPI_Barrier(MPI_COMM_WORLD);
-      for (int i = 1; i <= my_rows; i++){
-      	for (int j = 1; j < cols-1; j++){	
+      for ( i = 1; i <= my_rows; i++){
+      	for ( j = 1; j < cols-1; j++){	
 		if(i != 0 && !(end_row == rows-1 && i == my_rows)  && rank+i != 1){
 		B[i][j] = ( A[i-1][j-1] + A[i-1][j] + A[i-1][j+1] + A[i][j+1] + A[i+1][j+1] + A[i+1][j] + A[i+1][j-1] + A[i][j-1] + A[i][j]  ) / 9.0;
             }

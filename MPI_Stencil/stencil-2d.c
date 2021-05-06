@@ -5,8 +5,9 @@
 
 
 void print2d(double** a, int nrows, int ncols){
-	for(int i = 0; i<nrows; i++){
-		for(int j = 0; j<ncols; j++){
+	int i,j;
+	for(i = 0; i<nrows; i++){
+		for(j = 0; j<ncols; j++){
 			printf("%lf ", a[i][j]);
 		}	printf("\n");
 	}
@@ -62,8 +63,8 @@ int main(int argc, char* argv[]){
 
 	B = (double**)malloc(numRows*sizeof(double*));
 	B[0] = (void*)malloc(numRows*numCols*sizeof(double));
-
-	for(int j = 1; j < numRows; j++){
+	int j;
+	for(j = 1; j < numRows; j++){
 		A[j] = A[j-1] + numCols;
 		B[j] = B[j-1] + numCols;
 	}
@@ -74,10 +75,10 @@ int main(int argc, char* argv[]){
 	//memcpy(B, A, numRows*numCols*sizeof(double));
 
 	fclose(finptr);
-
+	int i;
 	//Create copy of A in B
-	for(int i=0; i<numRows; i++){
-		for(int j=0; j<numCols; j++){
+	for(i=0; i<numRows; i++){
+		for(j=0; j<numCols; j++){
 			B[i][j] = A[i][j];
 		}
 	}
@@ -89,8 +90,8 @@ int main(int argc, char* argv[]){
 	//Math for stencil code iterations
 	while(iters < numIter){
 		printf("LOOP #%d\n", iters);
-		for(int i = 1; i < numRows - 1; i++){
-			for(int j = 1; j < numCols - 1; j++){
+		for(i = 1; i < numRows - 1; i++){
+			for(j = 1; j < numCols - 1; j++){
 				//printf("Computing cell %d...\n", i+j);
 				B[i][j] = (A[i-1][j-1] + A[i-1][j] + A[i-1][j+1] + A[i][j-1] + A[i][j] + A[i][j+1] + A[i+1][j-1] + A[i+1][j] + A[i+1][j+1])/9;
 			//printf("B[%d][%d] = %f\n",i,j,B[i][j]);

@@ -51,7 +51,7 @@ int main (int argc, char * argv[]) {
     fread(&cols, sizeof(int), 1, fptr);
 
    // printf("rows = %d, cols = %d \n", rows, cols);
-
+	int i,j;
     if (!(rows < 0 || cols < 0)){
 
        a = (double*) malloc(sizeof(double)*(rows*cols));
@@ -59,8 +59,8 @@ int main (int argc, char * argv[]) {
         fread(a, sizeof(double), (rows*cols), fptr);
         fclose(fptr);
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++){
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++){
                 printf("%.2f\t", *a++);
             }  
             printf ("\n");
