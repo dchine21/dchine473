@@ -35,61 +35,56 @@ void global_sum(double* result, int rank, int size, double my_value){
 
 }
 
-void exchange_values(int* east_recValue, int* west_recValue, int rank, int* value, int size){
-		MPI_Status status;
-	//int** values = &value;
+void exchange_values(int* east_recValue, int* west_recValue, int rank, int size){
+	MPI_Status status;
 	if(rank % 2 == 0){
 		//sendrecv east
 		if(rank + 1 != size){		
 		//printf("Even numbered process %d, sendrecv with process %d\n", rank, rank+1);
-		MPI_Sendrecv(value, 1, MPI_INT, rank+1, 99, east_recValue, 1, MPI_INT, rank+1, 99, MPI_COMM_WORLD, &status);
-		//exchange_east(east_recValue, rank, &value[0], size);
+		MPI_Sendrecv(&rank, 1, MPI_INT, rank+1, 99, east_recValue, 1, MPI_INT, rank+1, 99, MPI_COMM_WORLD, &status);
 		}
 		
 		//sendrecv west
 		if(rank - 1 != -1){
 		//printf("Even numbered process %d, sendrecv west\n", rank);
-		MPI_Sendrecv(value, 1, MPI_INT, rank-1, 99, west_recValue, 1, MPI_INT, rank-1, 99, MPI_COMM_WORLD, &status);
-		//exchange_west(west_recValue, rank, &value[0], size);
+		MPI_Sendrecv(&rank, 1, MPI_INT, rank-1, 99, west_recValue, 1, MPI_INT, rank-1, 99, MPI_COMM_WORLD, &status);
 		}
 	}
 	else{
 			//sendrecv west
 		if(rank - 1 != -1){
 		//printf("Odd numbered process %d, sendrecv with process %d \n", rank, rank-1);
-		MPI_Sendrecv(value, 1, MPI_INT, rank-1, 99, west_recValue, 1, MPI_INT, rank-1, 99, MPI_COMM_WORLD, &status);
-		//exchange_west(west_recValue, rank, &value[0], size);
+		MPI_Sendrecv(&rank, 1, MPI_INT, rank-1, 99, west_recValue, 1, MPI_INT, rank-1, 99, MPI_COMM_WORLD, &status);
 		}
 		//sendrecv east
 		if(rank + 1 != size){	
 		//printf("Odd numbered process %d, sendrecv east \n", rank);
-		MPI_Sendrecv(value, 1, MPI_INT, rank+1, 99, east_recValue, 1, MPI_INT, rank+1, 99, MPI_COMM_WORLD, &status);
-		//exchange_east(east_recValue, rank, &value[0], size);
+		MPI_Sendrecv(&rank, 1, MPI_INT, rank+1, 99, east_recValue, 1, MPI_INT, rank+1, 99, MPI_COMM_WORLD, &status);
 		}
 	}
 
-return;
+	return;
 }
 
 
 
 
 //unused
-void exchange_east(int* east_recValue, int rank, int* value, int size){
+void exchange_east(int* east_recValue, int rank, int size){
 	MPI_Status status;
 	printf("Process %d starting sendrecv east\n", rank);
 	if(rank + 1 != size){
-		MPI_Sendrecv(&value[0], 1, MPI_INT, rank+1, 99, east_recValue, 1, MPI_INT, rank+1, 99, MPI_COMM_WORLD, &status);
+		MPI_Sendrecv(&rank, 1, MPI_INT, rank+1, 99, east_recValue, 1, MPI_INT, rank+1, 99, MPI_COMM_WORLD, &status);
 	}
 	printf("Process %d received %d from %d \n", rank, *east_recValue, rank+1);
 	return;
 }
 
-void exchange_west(int* west_recValue, int rank, int* value, int size){
+void exchange_west(int* west_recValue, int rank, int size){
 	MPI_Status status;
 	printf("Process %d starting sendrecv west\n", rank);
 	if(rank - 1 != -1){
-		MPI_Sendrecv(&value[0], 1, MPI_INT, rank-1, 99, west_recValue, 1, MPI_INT, rank-1, 99, MPI_COMM_WORLD, &status);
+		MPI_Sendrecv(&rank, 1, MPI_INT, rank-1, 88, west_recValue, 1, MPI_INT, rank-1, 88, MPI_COMM_WORLD, &status);
 	}
 	return;
 }
